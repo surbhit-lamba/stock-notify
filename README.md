@@ -1,3 +1,1 @@
 # stock-notify
-
-# test commit
