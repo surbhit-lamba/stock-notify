@@ -35,6 +35,7 @@ func hello(name string) {
 
 func runCronJobs() {
 	s := gocron.NewScheduler(time.UTC)
+	
 
 	s.Every(10).Seconds().Do(func() {
 		hello("John Doe")
