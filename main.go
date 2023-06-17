@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"stock-notify/internal/utils"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -37,16 +38,11 @@ func main() {
 	}
 }
 
-func hello(name string) {
-	message := fmt.Sprintf("Hi, %v", name)
-	fmt.Println(message)
-}
-
 func runCronJobs() {
 	s := gocron.NewScheduler(time.UTC)
 
 	s.Every(10).Seconds().Do(func() {
-		hello("John Doe")
+		utils.SendEmail()
 	})
 
 	s.StartBlocking()
