@@ -53,5 +53,5 @@ func SendEmail() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Email Sent!")
+	fmt.Println("Email Sent!!")
 }
