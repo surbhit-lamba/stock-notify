@@ -9,6 +9,8 @@ RUN go mod download
 # add source code
 COPY . .
 
+EXPOSE 81
+
 # build the source
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o stock-notify-amd64
 
