@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 	"stock-notify/internal/router"
 	"stock-notify/jobs"
 	"stock-notify/pkg/log"
@@ -15,8 +16,8 @@ func main() {
 	ctx := context.Background()
 
 	nrApp, err := newrelic.NewApplication(
-		newrelic.ConfigAppName("Stock notify"),
-		newrelic.ConfigLicense("8b902c7cb9de77e972b811d71939d9f5aec3NRAL"),
+		newrelic.ConfigAppName(os.Getenv("NEWRELIC_NAME")),
+		newrelic.ConfigLicense(os.Getenv("NEWRELIC_KEY")),
 		newrelic.ConfigAppLogForwardingEnabled(true),
 	)
 
