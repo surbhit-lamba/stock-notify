@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"stock-notify/internal/constants"
 	"stock-notify/internal/utils"
@@ -23,11 +24,12 @@ func NotifyNifty50Stock(ctx context.Context) {
 	timeNow = timeNow.In(l)
 	weekDay := timeNow.Weekday()
 	if utils.SliceContains(weekDay, constants.WeekEnds) {
-		newrelic.NoticeExpectedError(ctx, err)
+		newrelic.NoticeExpectedError(ctx, fmt.Errorf("weekend skip"))
 		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping checking")
 		return
 	}
 	if (timeNow.Hour() <= 9 && timeNow.Minute() < 15) || (timeNow.Hour() >= 15 && timeNow.Minute() > 30) {
+		newrelic.NoticeExpectedError(ctx, fmt.Errorf("non trading hours skip"))
 		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not in trading window, skipping checking")
 		return
 	}
