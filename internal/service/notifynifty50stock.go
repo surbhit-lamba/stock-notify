@@ -14,6 +14,7 @@ import (
 )
 
 func NotifyNifty50Stock(ctx context.Context) {
+	defer newrelic.StartSegmentWithContext(ctx, "NotifyNifty50Stock").End()
 	timeNow := time.Now()
 	l, err := time.LoadLocation("Asia/Kolkata")
 	if err != nil {
