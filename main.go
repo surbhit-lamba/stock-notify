@@ -5,13 +5,12 @@ import (
 	"fmt"
 	"net/http"
 	"stock-notify/internal/constants"
+	"stock-notify/internal/router"
 	"stock-notify/internal/utils"
 	"stock-notify/pkg/log"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/go-co-op/gocron"
-	"github.com/newrelic/go-agent/v3/integrations/nrgin"
 	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
@@ -28,9 +27,7 @@ func main() {
 
 	go runCronJobs()
 
-	r := gin.New()
-	r.Use(nrgin.Middleware(nrApp))
-	setRoutes(r.Group("stocks"), ctx)
+	r := router.SetupRouter(ctx, nrApp)
 	srv := &http.Server{
 		Addr:         "0.0.0.0:81",
 		Handler:      r,
@@ -59,10 +56,4 @@ func runCronJobs() {
 	}
 
 	s.StartBlocking()
-}
-
-func setRoutes(r *gin.RouterGroup, ctx context.Context) {
-	r.GET("/health", func(ctx *gin.Context) {
-		ctx.String(http.StatusOK, "yoo healthy!!")
-	})
 }
