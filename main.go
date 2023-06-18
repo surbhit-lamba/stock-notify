@@ -43,7 +43,7 @@ func main() {
 
 	r := router.SetupRouter(ctx, ev, nrApp)
 	srv := &http.Server{
-		Addr:         "0.0.0.0:81",
+		Addr:         "0.0.0.0:3000",
 		Handler:      r,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
