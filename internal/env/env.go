@@ -1,6 +1,7 @@
 package env
 
 import (
+	"context"
 	"stock-notify/pkg/httpclient"
 
 	"github.com/gin-gonic/gin"
@@ -31,6 +32,21 @@ func MiddleWare(env *Env) func(*gin.Context) {
 		ctx.Set(EnvCtxKey, env)
 		ctx.Next()
 	}
+}
+
+// WithContext returns a context containing the env Value
+func (env *Env) WithContext(ctx context.Context) context.Context {
+	nctx := context.WithValue(ctx, EnvCtxKey, env)
+	return nctx
+}
+
+func FromContext(ctx context.Context) *Env {
+	env, ok := ctx.Value(EnvCtxKey).(*Env)
+	if !ok {
+		panic("could not fetch env from context")
+	}
+
+	return env
 }
 
 // WithAlphaVantageHttpConn sets alpha vantage http client in the Env

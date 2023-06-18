@@ -2,14 +2,13 @@ package httpclient
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
 	"stock-notify/internal/constants"
 	"stock-notify/pkg/log"
-
-	"github.com/gin-gonic/gin"
 )
 
 type requestIdentifier string
@@ -34,25 +33,16 @@ type RequestConfig struct {
 	Headers     map[string]string
 }
 
-func (rc *RequestClient) MakeRequest(ctx *gin.Context, request *RequestConfig, responseAddr interface{}) error {
+func (rc *RequestClient) MakeRequest(ctx context.Context, request *RequestConfig, responseAddr interface{}) error {
 	httpReq := rc.newHTTPRequest(ctx, request.Method, request.Path)
 	httpReq.SetHost(rc.Authority)
 	// add body for request
 	reqBytes, err := json.Marshal(request.Body)
-	log.InfofWithContext(ctx, "%s request, method: %s | request: %s", rc.Identifier, request.Path, string(reqBytes))
 	if err != nil {
-		log.ErrorfWithContext(ctx, "%s client - request marshal error userID %s | ", rc.Identifier, ctx.PostForm("user_id"))
+		log.ErrorfWithContext(ctx, "%s client - request marshal error | ", rc.Identifier, err.Error())
 		return fmt.Errorf("%s client - request marshal error", rc.Identifier)
 	}
 	httpReq.SetBody(bytes.NewBuffer(reqBytes))
-
-	// for keys where value is present in ctx
-	for _, header := range request.HeaderKeys {
-		headerValue := ctx.GetHeader(header)
-		if headerValue != "" {
-			httpReq.SetHeader(header, headerValue)
-		}
-	}
 
 	// for manual setting of headers
 	for key, name := range request.Headers {
@@ -94,7 +84,7 @@ func (rc *RequestClient) MakeRequest(ctx *gin.Context, request *RequestConfig, r
 	return nil
 }
 
-func (os *RequestClient) newHTTPRequest(ctx *gin.Context, method, path string) *Request {
+func (os *RequestClient) newHTTPRequest(ctx context.Context, method, path string) *Request {
 	URL := url.URL{
 		Scheme: os.Scheme,
 		Host:   os.Host,

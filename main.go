@@ -27,16 +27,16 @@ func main() {
 
 	alphavantageClient := &httpclient.RequestClient{
 		Identifier: httpclient.AlphaVantage,
-		Host:       "https://www.alphavantage.co",
+		Host:       "www.alphavantage.co",
 		Scheme:     "https",
-		Authority:  "https://www.alphavantage.co",
+		Authority:  "www.alphavantage.co",
 	}
 
 	ev := env.NewEnv(
 		env.WithAlphaVantageHttpConn(alphavantageClient),
 	)
 
-	jobs.SetupCronJobs(ctx)
+	jobs.SetupCronJobs(ev.WithContext(ctx))
 
 	r := router.SetupRouter(ctx, ev, nrApp)
 	srv := &http.Server{
