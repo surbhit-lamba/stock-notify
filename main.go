@@ -9,18 +9,21 @@ import (
 	"stock-notify/jobs"
 	"stock-notify/pkg/httpclient"
 	"stock-notify/pkg/log"
+	"stock-notify/pkg/newrelic"
 	"time"
-
-	"github.com/newrelic/go-agent/v3/newrelic"
 )
 
 func main() {
 	ctx := context.Background()
 
-	nrApp, err := newrelic.NewApplication(
-		newrelic.ConfigAppName(os.Getenv("NEWRELIC_NAME")),
-		newrelic.ConfigLicense(os.Getenv("NEWRELIC_KEY")),
-		newrelic.ConfigAppLogForwardingEnabled(true),
+	nrApp := newrelic.Initialize(
+		&newrelic.Options{
+			Name:                   os.Getenv("NEWRELIC_NAME"),
+			License:                os.Getenv("NEWRELIC_KEY"),
+			Enabled:                true,
+			CrossApplicationTracer: true,
+			DistributedTracer:      true,
+		},
 	)
 
 	log.Initialize(ctx)
@@ -45,7 +48,7 @@ func main() {
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-	err = srv.ListenAndServe()
+	err := srv.ListenAndServe()
 	if err != nil {
 		log.ErrorfWithContext(ctx, "unable to start http server")
 	}
