@@ -17,6 +17,10 @@ func SetupRouter(ctx context.Context, ev *env.Env, nrApp *newrelic.Application) 
 
 	r.Use(env.MiddleWare(ev))
 
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "welcome to stock-notify")
+	})
+
 	setRoutes(r.Group("stocks"), ctx)
 
 	return r
