@@ -8,3 +8,10 @@ const (
 const (
 	ContentEncodingGZIP string = "gzip"
 )
+
+const (
+	ResponseAdd string = "responseAddr"
+	Request     string = "request"
+	Err         string = "err"
+	Path        string = "path"
+)

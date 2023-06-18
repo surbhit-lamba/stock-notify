@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/http"
 	"os"
+	"stock-notify/internal/env"
 	"stock-notify/internal/router"
 	"stock-notify/jobs"
+	"stock-notify/pkg/httpclient"
 	"stock-notify/pkg/log"
 	"time"
 
@@ -23,9 +25,20 @@ func main() {
 
 	log.Initialize(ctx)
 
+	alphavantageClient := &httpclient.RequestClient{
+		Identifier: httpclient.AlphaVantage,
+		Host:       "https://www.alphavantage.co",
+		Scheme:     "https",
+		Authority:  "https://www.alphavantage.co",
+	}
+
+	ev := env.NewEnv(
+		env.WithAlphaVantageHttpConn(alphavantageClient),
+	)
+
 	jobs.SetupCronJobs(ctx)
 
-	r := router.SetupRouter(ctx, nrApp)
+	r := router.SetupRouter(ctx, ev, nrApp)
 	srv := &http.Server{
 		Addr:         "0.0.0.0:81",
 		Handler:      r,
