@@ -19,7 +19,19 @@ func NotifyNifty50Stock(ctx context.Context) {
 	//	log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping sending mail")
 	//	return
 	//}
-	fmt.Println(timeNow.Hour())
+	fmt.Println(timeNow)
+	l, err := time.LoadLocation("Asia/Kolkata")
+	if err != nil {
+		log.ErrorfWithContext(ctx, "unable to load location", err.Error())
+		return
+	}
+	fmt.Println(timeNow.In(l))
+	l, err = time.LoadLocation("Asia/Dubai")
+	if err != nil {
+		log.ErrorfWithContext(ctx, "unable to load location", err.Error())
+		return
+	}
+	fmt.Println(timeNow.In(l))
 	return
 	av := avClient.NewClient(os.Getenv("ALPHAVANTAGE_API_KEY"))
 	for _, symbol := range constants.Nifty50AlphaVantageSymbols {
