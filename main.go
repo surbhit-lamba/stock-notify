@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"stock-notify/internal/env"
 	"stock-notify/internal/router"
@@ -9,6 +10,7 @@ import (
 	"stock-notify/pkg/httpclient"
 	"stock-notify/pkg/log"
 	"stock-notify/pkg/newrelic"
+	"time"
 )
 
 func main() {
@@ -40,15 +42,14 @@ func main() {
 	jobs.SetupCronJobs(ev.WithContext(ctx))
 
 	r := router.SetupRouter(ctx, ev, nrApp)
-	r.Run()
-	//srv := &http.Server{
-	//	Addr:         "0.0.0.0:3000",
-	//	Handler:      r,
-	//	ReadTimeout:  10 * time.Second,
-	//	WriteTimeout: 10 * time.Second,
-	//}
-	//err := srv.ListenAndServe()
-	//if err != nil {
-	//	log.ErrorfWithContext(ctx, "unable to start http server")
-	//}
+	srv := &http.Server{
+		Addr:         "0.0.0.0:" + os.Getenv("PORT"),
+		Handler:      r,
+		ReadTimeout:  10 * time.Second,
+		WriteTimeout: 10 * time.Second,
+	}
+	err := srv.ListenAndServe()
+	if err != nil {
+		log.ErrorfWithContext(ctx, "unable to start http server")
+	}
 }
