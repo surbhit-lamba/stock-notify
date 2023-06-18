@@ -2,12 +2,14 @@ package utils
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net/smtp"
+	"stock-notify/pkg/log"
 	"text/template"
 )
 
-func SendEmail() {
+func SendEmailWithHTMLTemplate(ctx context.Context) {
 	// Sender data.
 	from := "surbhitla@gmail.com"
 	password := "hP3b8iDkmGFl39IX"
@@ -24,9 +26,9 @@ func SendEmail() {
 	// Authentication.
 	auth := smtp.PlainAuth("stock-notifiers", "stock-notifiers", password, smtpHost)
 
-	t, err := template.ParseFiles("template.html")
+	t, err := template.ParseFiles("emailtemplates/template.html")
 	if err != nil {
-		fmt.Println("lag gye na ", err.Error())
+		log.ErrorfWithContext(ctx, "could not parse email")
 		return
 	}
 
@@ -52,5 +54,21 @@ func SendEmail() {
 		fmt.Println(err)
 		return
 	}
-	fmt.Println("Email Sent!!")
+}
+
+func SendEmail(ctx context.Context, from string, to []string, body []byte) {
+	// smtp server configuration.
+	smtpHost := "mail.smtp2go.com"
+	smtpPort := "2525"
+	username := "stock-notifiers"
+	password := "hP3b8iDkmGFl39IX"
+
+	// Authentication.
+	auth := smtp.PlainAuth("", username, password, smtpHost)
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body)
+	if err != nil {
+		log.ErrorfWithContext(ctx, "[SendEmail] could not send email - ", err.Error())
+		return
+	}
+	log.InfofWithContext(ctx, "[SendEmail] sent mail - ", from, to, string(body))
 }

@@ -28,4 +28,3 @@ func setHealthRoutes(r *gin.RouterGroup, ctx context.Context) {
 		ctx.String(http.StatusOK, "yoo healthy!!")
 	})
 }
-
