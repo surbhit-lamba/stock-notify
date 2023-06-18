@@ -8,7 +8,6 @@ import (
 )
 
 func SendEmail() {
-
 	// Sender data.
 	from := "surbhitla@gmail.com"
 	password := "hP3b8iDkmGFl39IX"

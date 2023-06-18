@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"stock-notify/internal/constants"
 	"stock-notify/internal/utils"
+	"stock-notify/pkg/log"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -14,14 +16,17 @@ import (
 )
 
 func main() {
-	go runCronJobs()
-
 	ctx := context.Background()
+
 	nrApp, err := newrelic.NewApplication(
 		newrelic.ConfigAppName("Stock notify"),
 		newrelic.ConfigLicense("8b902c7cb9de77e972b811d71939d9f5aec3NRAL"),
 		newrelic.ConfigAppLogForwardingEnabled(true),
 	)
+
+	log.Initialize(ctx)
+
+	go runCronJobs()
 
 	r := gin.New()
 	r.Use(nrgin.Middleware(nrApp))
@@ -41,9 +46,17 @@ func main() {
 func runCronJobs() {
 	s := gocron.NewScheduler(time.UTC)
 
-	s.Every(10).Seconds().Do(func() {
-		utils.SendEmail()
+	_, err := s.Every(10).Seconds().Do(func() {
+		weekDay := time.Now().Weekday()
+		if utils.SliceContains(weekDay, constants.WeekDays) {
+			utils.SendEmail()
+		} else {
+			fmt.Println("not a weekday")
+		}
 	})
+	if err != nil {
+		return
+	}
 
 	s.StartBlocking()
 }
