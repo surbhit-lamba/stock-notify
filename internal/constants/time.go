@@ -24,3 +24,5 @@ var WeekEnds = []time.Weekday{
 	time.Saturday,
 	time.Sunday,
 }
+
+const TotalMonthsInAnYear = 12

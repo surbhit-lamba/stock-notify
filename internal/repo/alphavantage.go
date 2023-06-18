@@ -8,6 +8,7 @@ import (
 	"stock-notify/pkg/log"
 )
 
+// GetTimeSeriesMonthlyStockDataForStocks Not being used - instead moved to golang client
 func GetTimeSeriesMonthlyStockDataForStocks(ctx context.Context, stockSymbols []string) map[string]map[string]interface{} {
 	e := env.FromContext(ctx)
 	avClient := e.AlphaVantageHttpConn()

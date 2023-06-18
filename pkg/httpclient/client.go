@@ -3,7 +3,6 @@ package httpclient
 import (
 	"compress/gzip"
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net"
@@ -52,7 +51,6 @@ func NewClient(ctx context.Context) *Client {
 
 // Execute executes the given request object and returns a repsonse object
 func (c *Client) Execute(ctx context.Context, req Request) (Response, error) {
-	fmt.Println("url ", req.url.String())
 	hreq, err := http.NewRequestWithContext(ctx, req.method, req.url.String(), req.body)
 	if err != nil {
 		// TODO : Do logging/New Relic
