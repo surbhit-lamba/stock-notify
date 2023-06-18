@@ -1,8 +1,45 @@
 <!-- notifyNifty50Stock.html -->
 <!DOCTYPE html>
 <html>
+<head>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
 <body>
-<h3>Name:</h3><span>{{.Name}}</span><br/><br/>
-<h3>Email:</h3><span>{{.Message}}</span><br/>
+
+<h1>Reminder to buy stock</h2>
+    <h2>Stock Details table</h2>
+
+    <table>
+        <tr>
+            <th>Company</th>
+            <th>Current Price</th>
+            <th>52 wk High</th>
+            <th>52 wk Low</th>
+        </tr>
+        <tr>
+            <td>{{.StockName}}</td>
+            <td>{{.CurrPrice}}</td>
+            <td>{{.HighPrice}}</td>
+            <td>{{.LowPrice}}</td>
+        </tr>
+    </table>
+
 </body>
 </html>
+

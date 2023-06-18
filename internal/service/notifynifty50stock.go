@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"stock-notify/internal/constants"
 	"stock-notify/internal/utils"
@@ -14,28 +13,24 @@ import (
 
 func NotifyNifty50Stock(ctx context.Context) {
 	timeNow := time.Now()
-	//weekDay := timeNow.Weekday()
-	//if utils.SliceContains(weekDay, constants.WeekEnds) {
-	//	log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping sending mail")
-	//	return
-	//}
-	fmt.Println(timeNow)
 	l, err := time.LoadLocation("Asia/Kolkata")
 	if err != nil {
 		log.ErrorfWithContext(ctx, "unable to load location", err.Error())
 		return
 	}
-	fmt.Println(timeNow.In(l))
-	l, err = time.LoadLocation("Asia/Dubai")
-	if err != nil {
-		log.ErrorfWithContext(ctx, "unable to load location", err.Error())
+	timeNow = timeNow.In(l)
+	weekDay := timeNow.Weekday()
+	if utils.SliceContains(weekDay, constants.WeekEnds) {
+		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping checking")
 		return
 	}
-	fmt.Println(timeNow.In(l))
-	return
+	if (timeNow.Hour() <= 9 && timeNow.Minute() < 15) || (timeNow.Hour() >= 15 && timeNow.Minute() > 30) {
+		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not in trading window, skipping checking")
+		return
+	}
 	av := avClient.NewClient(os.Getenv("ALPHAVANTAGE_API_KEY"))
 	for _, symbol := range constants.Nifty50AlphaVantageSymbols {
-		resp, err := av.StockTimeSeries(avClient.TimeSeriesMonthly, "TITAN.BSE")
+		resp, err := av.StockTimeSeries(avClient.TimeSeriesMonthly, symbol)
 		if err != nil {
 			log.ErrorfWithContext(ctx, "[StockTimeSeries] err - ", err.Error())
 		}
@@ -43,7 +38,7 @@ func NotifyNifty50Stock(ctx context.Context) {
 		resp = utils.SliceReverse(resp)
 		currentPrice := resp[0].Close
 		var highPrice float64
-		var lowPrice float64
+		var lowPrice float64 = 9999999999999999
 		monthCounter := 1
 		for _, monthData := range resp {
 			if monthCounter > 12 {
@@ -64,14 +59,26 @@ func NotifyNifty50Stock(ctx context.Context) {
 			utils.SendEmailWithHTMLTemplate(
 				ctx,
 				os.Getenv("FROM_EMAIL"),
-				[]string{os.Getenv("TO_EMAIL")},
-				"emailtemplates/notifyNifty50Stock.html",
+				[]string{os.Getenv("TO_EMAIL"), os.Getenv("TO_EMAIL_2")},
 				"[StockNotify] "+symbol+" near 52 week low",
+				"emailtemplates/notifyNifty50Stock.html",
+				struct {
+					StockName string
+					CurrPrice float64
+					HighPrice float64
+					LowPrice  float64
+				}{
+					StockName: symbol,
+					CurrPrice: currentPrice,
+					HighPrice: highPrice,
+					LowPrice:  lowPrice,
+				},
 			)
 			log.InfofWithContext(ctx, "%v is %v percent away from low, sent email", symbol, diffPercentage)
 		} else {
 			log.InfofWithContext(ctx, "%v is %v percent away from low", symbol, diffPercentage)
 		}
+		time.Sleep(20 * time.Second)
 	}
 	return
 }

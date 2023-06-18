@@ -10,7 +10,7 @@ import (
 	"text/template"
 )
 
-func SendEmailWithHTMLTemplate(ctx context.Context, from string, to []string, templatePathFromRoot string, subject string) {
+func SendEmailWithHTMLTemplate(ctx context.Context, from string, to []string, subject string, templatePathFromRoot string, data any) {
 	t, err := template.ParseFiles(templatePathFromRoot)
 	if err != nil {
 		log.ErrorfWithContext(ctx, "[SendEmailWithHTMLTemplate] Parsing Error - ", err.Error())
@@ -22,13 +22,7 @@ func SendEmailWithHTMLTemplate(ctx context.Context, from string, to []string, te
 	mimeHeaders := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
 	body.Write([]byte(fmt.Sprintf("Subject: "+subject+"\n%s\n\n", mimeHeaders)))
 
-	err = t.Execute(&body, struct {
-		Name    string
-		Message string
-	}{
-		Name:    "Yolo Bhai",
-		Message: "This is a test stock message in a HTML template",
-	})
+	err = t.Execute(&body, data)
 	if err != nil {
 		log.ErrorfWithContext(ctx, "[SendEmailWithHTMLTemplate] Error - ", err.Error())
 	}
