@@ -6,6 +6,7 @@ import (
 	"stock-notify/internal/constants"
 	"stock-notify/internal/utils"
 	"stock-notify/pkg/log"
+	"stock-notify/pkg/newrelic"
 	"time"
 
 	avClient "github.com/curtismckee/go-alpha-vantage"
@@ -15,12 +16,14 @@ func NotifyNifty50Stock(ctx context.Context) {
 	timeNow := time.Now()
 	l, err := time.LoadLocation("Asia/Kolkata")
 	if err != nil {
+		newrelic.NoticeError(ctx, err)
 		log.ErrorfWithContext(ctx, "unable to load location", err.Error())
 		return
 	}
 	timeNow = timeNow.In(l)
 	weekDay := timeNow.Weekday()
 	if utils.SliceContains(weekDay, constants.WeekEnds) {
+		newrelic.NoticeExpectedError(ctx, err)
 		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping checking")
 		return
 	}
@@ -32,6 +35,7 @@ func NotifyNifty50Stock(ctx context.Context) {
 	for _, symbol := range constants.Nifty50AlphaVantageSymbols {
 		resp, err := av.StockTimeSeries(avClient.TimeSeriesMonthly, symbol)
 		if err != nil {
+			newrelic.NoticeError(ctx, err)
 			log.ErrorfWithContext(ctx, "[StockTimeSeries] err - ", err.Error())
 		}
 		// to make the array in descending order of time

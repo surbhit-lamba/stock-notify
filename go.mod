@@ -8,7 +8,9 @@ require (
 	github.com/go-co-op/gocron v1.28.3
 	github.com/newrelic/go-agent/v3 v3.22.1
 	github.com/newrelic/go-agent/v3/integrations/nrgin v1.1.3
+	github.com/newrelic/go-agent/v3/integrations/nrpkgerrors v1.1.0
 	go.uber.org/zap v1.24.0
+	google.golang.org/grpc v1.54.0
 )
 
 require (
@@ -40,7 +42,6 @@ require (
 	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f // indirect
-	google.golang.org/grpc v1.54.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

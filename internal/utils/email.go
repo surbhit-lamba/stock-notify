@@ -7,12 +7,14 @@ import (
 	"net/smtp"
 	"os"
 	"stock-notify/pkg/log"
+	"stock-notify/pkg/newrelic"
 	"text/template"
 )
 
 func SendEmailWithHTMLTemplate(ctx context.Context, from string, to []string, subject string, templatePathFromRoot string, data any) {
 	t, err := template.ParseFiles(templatePathFromRoot)
 	if err != nil {
+		newrelic.NoticeError(ctx, err)
 		log.ErrorfWithContext(ctx, "[SendEmailWithHTMLTemplate] Parsing Error - ", err.Error())
 		return
 	}
@@ -24,6 +26,7 @@ func SendEmailWithHTMLTemplate(ctx context.Context, from string, to []string, su
 
 	err = t.Execute(&body, data)
 	if err != nil {
+		newrelic.NoticeError(ctx, err)
 		log.ErrorfWithContext(ctx, "[SendEmailWithHTMLTemplate] Error - ", err.Error())
 	}
 
@@ -41,6 +44,7 @@ func SendEmail(ctx context.Context, from string, to []string, body bytes.Buffer)
 	auth := smtp.PlainAuth("", username, password, smtpHost)
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, body.Bytes())
 	if err != nil {
+		newrelic.NoticeError(ctx, err)
 		log.ErrorfWithContext(ctx, "[SendEmail] could not send email - ", err.Error())
 		return
 	}
