@@ -9,7 +9,7 @@ import (
 )
 
 func NotifyNifty50Stock(ctx context.Context, s *gocron.Scheduler) {
-	_, err := s.Every(10).Seconds().Do(func() {
+	_, err := s.Every(80).Minute().Do(func() {
 		service.NotifyNifty50Stock(ctx)
 	})
 	if err != nil {
