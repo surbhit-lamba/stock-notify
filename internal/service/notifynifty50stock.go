@@ -26,14 +26,15 @@ func NotifyNifty50Stock(ctx context.Context) {
 	weekDay := timeNow.Weekday()
 	if utils.SliceContains(weekDay, constants.WeekEnds) {
 		newrelic.NoticeExpectedError(ctx, fmt.Errorf("weekend skip"))
-		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping checking")
+		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping checking", timeNow)
 		return
 	}
 	if (timeNow.Hour() <= 9 && timeNow.Minute() < 15) || (timeNow.Hour() >= 15 && timeNow.Minute() > 30) {
 		newrelic.NoticeExpectedError(ctx, fmt.Errorf("non trading hours skip"))
-		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not in trading window, skipping checking")
+		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not in trading window, skipping checking", timeNow)
 		return
 	}
+	log.InfofWithContext(ctx, "[NotifyNifty50Stock] Proceeding for checks ", timeNow)
 	av := avClient.NewClient(os.Getenv("ALPHAVANTAGE_API_KEY"))
 	for _, symbol := range constants.Nifty50AlphaVantageSymbols {
 		resp, err := av.StockTimeSeries(avClient.TimeSeriesMonthly, symbol)
