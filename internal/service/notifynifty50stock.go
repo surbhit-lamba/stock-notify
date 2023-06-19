@@ -29,7 +29,8 @@ func NotifyNifty50Stock(ctx context.Context) {
 		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not a weekday, skipping checking", timeNow)
 		return
 	}
-	if (timeNow.Hour() <= 9 && timeNow.Minute() < 15) || (timeNow.Hour() >= 15 && timeNow.Minute() > 30) {
+
+	if (timeNow.Hour() < 9 || (timeNow.Hour() == 9 && timeNow.Minute() < 15)) || (timeNow.Hour() > 15 || (timeNow.Hour() == 15 && timeNow.Minute() > 30)) {
 		newrelic.NoticeExpectedError(ctx, fmt.Errorf("non trading hours skip"))
 		log.ErrorfWithContext(ctx, "[NotifyNifty50Stock] Not in trading window, skipping checking", timeNow)
 		return
